@@ -20,7 +20,7 @@ const schema = new mongoose.Schema({
     paymentType: {
         type: String,
         enum:[
-            "billet","credit_cart"
+            "billet","credit_card"
         ],
         required: true,
     },

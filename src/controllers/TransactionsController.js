@@ -4,6 +4,7 @@ import parsePhoneNumber from "libphonenumber-js";
 import { cpf, cnpj } from "cpf-cnpj-validator";
 
 import Cart from "../models/Cart.js";
+import TransactionService from "../services/TransactionService.js";
 
 class TransactionsController {
     async create(req, res){
@@ -82,16 +83,41 @@ class TransactionsController {
             // 1. Criar o transaction (registro)
             // 2. Integrar com o pagarme
             // 3. Processar regras (status)
-            
-            return res.status(200).json();
 
+            const service = new TransactionService();
+            const response = await service.process(
+                cartCode, 
+                paymentType, 
+                installments, 
+                customer = {
+                    name: customerName,
+                    email: customerName, 
+                    mobile: customerMobile, 
+                    document: customerDocument
+                },
+                billing = {
+                    address: billingAddress,
+                    number: billingNumber,
+                    neighborhood: billingNeighborhood, 
+                    city: billingCity, 
+                    state: billingState,
+                    zipcode: billingZipCode
+                },
+                creditCard = {
+                    number: creditCardNumber,
+                    expiration: creditCardExpiration,
+                    holderName: creditCardHolderName,
+                    cvv: creditCardCvv
+                }
+            );
+            
+            return res.status(200).json(response);
 
         }catch(err){
             console.error(err);
             return res.status(500).json({error: "Internal server error."});
         }
-    }
-   
+    } 
     
 }
 
