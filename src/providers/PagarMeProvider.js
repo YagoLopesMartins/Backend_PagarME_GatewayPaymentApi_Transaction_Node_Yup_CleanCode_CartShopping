@@ -1,4 +1,5 @@
 import { cpf } from "cpf-cnpj-validator";
+import pagarme from "pagarme";
 
 class PagarMeProvider {
     async process({
@@ -21,6 +22,7 @@ class PagarMeProvider {
             payment_method: "credit_card",
             amount: total * 100,
             installments,
+            card_holder_name: creditCard.holderName,
             card_number: creditCard.number.replace(/[^?0-9]/g, ""),
             card_expiration_date: creditCard.expiration.replace(/[^?0-9]/g, ""),
             card_cvv: creditCard.cvv,
@@ -52,11 +54,7 @@ class PagarMeProvider {
             },
         };
 
-        const billingParams = {
-
-        };
-
-        const transactionParams = billing?.zipcode ? {
+        const billingParams = billing?.zipcode ? {
             billing: {
                 name: "Billing Address",
                 address: {
@@ -64,9 +62,9 @@ class PagarMeProvider {
                     state: billing.state,
                     city: billing.city,
                     neighborhood: billing.neighborhood,
-                    street: billing.street,
+                    street: billing.address,
                     street_number: billing.number,
-                    zipcode: billing.zipcode,
+                    zipcode: billing.zipcode.replace(/[^?0-9]/g, ""),
                 },
             },
         } : {};
@@ -91,6 +89,31 @@ class PagarMeProvider {
                 },
             ],
         };
+
+        const metadataParams = {
+            metadata: {
+                transaction_code: transactionCode,
+            },
+        };
+
+        const  transactionParams = { 
+            async: false,
+            // postback_url: "",
+            ...paymentParams,
+            ...customerParams,
+            ...billetParams,
+            ...itemsParams,
+            ...metadataParams,
+        };
+
+        const client = await pagarme.client.connect({
+            api_key: process.env.PAGARME_API_KEY,
+        })
+        
+        const response = await client.transactions.create(transactionParams);
+
+        // console.debug("transactionParams", transactionParams);
+        console.debug("response", response);
     }
 }
 
