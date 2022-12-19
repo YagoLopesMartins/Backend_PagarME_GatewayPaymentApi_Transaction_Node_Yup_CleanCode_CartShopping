@@ -92,7 +92,7 @@ class TransactionsController {
                 customer = {
                     name: customerName,
                     email: customerName, 
-                    mobile: customerMobile, 
+                    mobile: parsePhoneNumber(customerMobile, "BR").format("E.164"),
                     document: customerDocument
                 },
                 billing = {
@@ -118,7 +118,7 @@ class TransactionsController {
             return res.status(500).json({error: "Internal server error."});
         }
     } 
-    
+
 }
 
 export default new TransactionsController();
