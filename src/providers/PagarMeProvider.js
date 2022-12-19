@@ -114,6 +114,33 @@ class PagarMeProvider {
 
         // console.debug("transactionParams", transactionParams);
         console.debug("response", response);
+
+        return {
+            transactionId: response.id,
+            status: this.translateStatus(response.status),
+            billet:{
+                url: response.boleto_url,
+                barCode: response.boleto_barcode,
+            },
+            card: {
+                id: response.card?.id,
+            },
+            processorResponse: JSON.stringify(response),
+        }
+    }
+
+    translateStatus(status){
+        const statusMap = {
+            processing: "processing",
+            waiting_payment: "pending",
+            authorized: "pending",
+            paid: "approved",
+            refused: "refused",
+            pending_refund: "refunded",
+            refunded: "refunded",
+            chargedback: "chargeback", // chargedback
+        };
+        return statusMap[status];
     }
 }
 

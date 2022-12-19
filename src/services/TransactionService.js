@@ -46,7 +46,7 @@ class TransactionService {
             billingZipCode: billing.zipcode,
         });
 
-        this.paymentProvider.process({
+        const response = this.paymentProvider.process({
             transactionCode: transaction.code,
             total: transaction.total,
             paymentType,
@@ -56,7 +56,14 @@ class TransactionService {
             creditCard,
         });
 
-        return transaction;
+        transaction.updateOne({
+            transactionId: response.transactionId,
+            status: response.status,
+            processorResponse: response.processorResponse,
+        });
+
+        return response;
+        // return transaction;
     }
 }
 
