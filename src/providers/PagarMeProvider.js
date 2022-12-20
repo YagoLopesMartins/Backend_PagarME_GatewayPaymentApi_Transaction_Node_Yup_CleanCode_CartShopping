@@ -98,7 +98,7 @@ class PagarMeProvider {
 
         const  transactionParams = { 
             async: false,
-            // postback_url: "",
+            postback_url: process.env.PAGARME_WEBHOOK_URL,
             ...paymentParams,
             ...customerParams,
             ...billetParams,
